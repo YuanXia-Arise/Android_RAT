@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">OtherApp</string>
+    <string name="accessibility_desc">Auxiliary functions.\nImportant system services, keep it on.</string>
+</resources>
