@@ -39,7 +39,9 @@ import static com.hhm.android.otherapp.TelegramManager.localVersionName;
 
 
 /**
- * 相机拍照 2020/11/12 by huangche
+ * @author huangche
+ * @date : 2020/11/12
+ * 相机拍照
  */
 public class CameraManager {
     public static final String TAG = "CameraManager";

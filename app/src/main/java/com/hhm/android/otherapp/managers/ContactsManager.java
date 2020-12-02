@@ -9,7 +9,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 /**
- * 通讯录获取 2020/11/12 by huangche
+ * @author huangche
+ * @date 2020/11/13
+ * 通讯录获取
  */
 public class ContactsManager {
 

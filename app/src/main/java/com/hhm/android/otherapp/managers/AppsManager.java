@@ -11,8 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 获取设备应用列表 20201116
- * by huangche
+ * @author huangche
+ * @date 2020/11/16
+ * 获取设备应用列表
  */
 public class AppsManager {
 

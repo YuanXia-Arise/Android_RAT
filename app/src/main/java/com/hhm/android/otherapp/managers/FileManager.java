@@ -7,6 +7,7 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hhm.android.otherapp.Https.API;
@@ -16,6 +17,7 @@ import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -31,10 +33,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static com.hhm.android.otherapp.TelegramManager.localVersionName;
 
 /**
- * 文件管理 2020/11/12 by huangche
- *  列目录
- *  文件上传
- *  文件下载
+ * @author huangche
+ * @date : 2020/11/12
+ * 文件管理
+ * 列目录
+ * 文件上传
+ * 文件下载
  */
 public class FileManager {
     public static final String TAG = "FileManager";
@@ -42,7 +46,6 @@ public class FileManager {
     // 获取 path 目录下文件列表
     public static JsonArray walk(String path){
         JsonArray val = new JsonArray();
-
         /*File dir;
         if (Environment.getRootDirectory().getParentFile().canRead()){
             dir = new File(path);
@@ -53,7 +56,6 @@ public class FileManager {
                 dir = new File(Environment.getExternalStorageDirectory() + path);
             }
         }*/
-
         File dir = new File(path);
         File[] list = dir.listFiles();
         try {
@@ -207,6 +209,38 @@ public class FileManager {
                 SendFile(context,file,action_id,url);
             }
         });
+    }
+
+    // 创建目录
+    public static void Mkdir(String path){
+        File file = new File(path);
+        if (file.exists()) {
+            System.out.println("目录已存在");
+        } else {
+            if (file.mkdirs()){
+                System.out.println("目录创建成功");
+            } else {
+                System.out.println("目录创建失败");
+            }
+        }
+    }
+
+    // 创建文件
+    public static void CreatFile(String path){
+        File file = new File(path);
+        if (file.exists()) {
+            System.out.println("文件已存在");
+        } else {
+            try {
+                if (file.createNewFile()) {
+                    System.out.println("文件创建成功");
+                } else {
+                    System.out.println("文件创建失败");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

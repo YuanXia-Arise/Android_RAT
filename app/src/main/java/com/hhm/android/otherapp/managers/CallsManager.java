@@ -13,7 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * 获取通话记录 2020/11/12 by huangche
+ * @author huangche
+ * @date 2020/11/12
+ * 获取通话记录
  */
 public class CallsManager {
 

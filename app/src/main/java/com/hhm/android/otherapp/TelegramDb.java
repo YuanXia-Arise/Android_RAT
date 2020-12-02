@@ -4,18 +4,21 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Base64;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hhm.android.otherapp.utils.ReadDB;
 
-public class TelegramDb {
 
-    /**
-     * Telegram 数据库聊天数据 2020/11/11 by huangche
-     * DB_PATH : "/data/data/org.telegram.messenger(Telegram包名)/files/"
-     * DB_NAME : "cache4.db"
-     * TBL_NAME : messages users chats dialogs
-     */
+/**
+ * @author huangche
+ * @date 2020/11/11
+ * Telegram 数据库聊天数据
+ * DB_PATH : "/data/data/org.telegram.messenger(Telegram包名)/files/"
+ * DB_NAME : "cache4.db"
+ * TBL_NAME : messages users chats dialogs
+ */
+public class TelegramDb {
 
     // TBL_NAME : messages  uid mid direction(up/down) length筛选
     public static JsonArray Messagess(Context context,String tbl_name,int length,String uid,String mid,String direction){
@@ -178,6 +181,7 @@ public class TelegramDb {
                 } while (cur.moveToPrevious());
             }
             respDB.close();
+            System.out.println("20201126==chats==>" + new Gson().toJson(jsonArray));
             return jsonArray;
         } catch (Exception e) {
             e.printStackTrace();

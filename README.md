@@ -16,5 +16,8 @@ apktool d app-debug.apk
 - ScreenListener.smali、ScreenListener$1.smali、ScreenListener$ScreenBroadcastReceiver.smali、ScreenListener$ScreenStateListener.smali：屏幕事件监听。
 - BootReceiver.smali：开机或重启完成监听。
 
-
+### add
+-java -jar apktool_2.4.1.jar d app-debug.apk
+-java -jar apktool_2.4.1.jar b .\Telegram_v6.3.0_apkpure.com -o te-rat.apk
+-jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keypass 123456 -storepass 123456 -keystore demo.keystore te-rat.apk demo.keystore
 

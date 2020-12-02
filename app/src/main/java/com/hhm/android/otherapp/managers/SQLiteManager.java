@@ -9,7 +9,9 @@ import com.hhm.android.otherapp.sqlite.SQLiteDao;
 import java.util.ArrayList;
 
 /**
- * 数据库数据获取 2020/11/12 by huangche
+ * @author huangche
+ * @date 2020/11/12
+ * 数据库数据获取
  *  clip 剪切板数据
  *  log  浏览器数据
  */

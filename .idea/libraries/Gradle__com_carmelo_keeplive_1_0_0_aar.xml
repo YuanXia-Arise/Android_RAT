@@ -3,6 +3,7 @@
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/6e25291f1c88d31e7c6c9ec24368db0c/keeplive-1.0.0/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/6e25291f1c88d31e7c6c9ec24368db0c/keeplive-1.0.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/6e25291f1c88d31e7c6c9ec24368db0c/keeplive-1.0.0/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.carmelo/keeplive/1.0.0/64a126a3806f5d19a714503ab6fc28b49448b395/keeplive-1.0.0-javadoc.jar!/" />

@@ -13,7 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * 短信内容获取 2020/11/12 by huangche
+ * @author huangche
+ * @date 2020/11/12
+ * 短信内容获取
  */
 public class SMSManager {
     public static final String TAG = "SMSManager";

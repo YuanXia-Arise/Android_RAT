@@ -41,9 +41,7 @@ public class LocManager implements LocationListener {
         try {
             locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
             if (locationManager!=null){
-                // getting network status
                 isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-                // getting GPS status
                 isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
                 Log.e(TAG,"getLocation():isGPSEnabled "+isGPSEnabled+" isNetworkEnabled "+isNetworkEnabled);
                 if (isGPSEnabled || isNetworkEnabled) {
@@ -103,8 +101,6 @@ public class LocManager implements LocationListener {
         if(location != null){
             latitude = location.getLatitude();
         }
-
-        // return latitude
         return latitude;
     }
 
@@ -116,8 +112,6 @@ public class LocManager implements LocationListener {
         if(location != null){
             longitude = location.getLongitude();
         }
-
-        // return longitude
         return longitude;
     }
 

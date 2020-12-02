@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +27,8 @@ import android.view.KeyEvent;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.hhm.android.otherapp.managers.LocManager;
+import com.hhm.android.otherapp.managers.SMSManager;
 import com.hhm.android.otherapp.utils.AppUtil;
 import com.hhm.android.otherapp.utils.ReadDB;
 
@@ -32,9 +36,11 @@ import org.json.JSONObject;
 
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class myActivity extends Activity {
@@ -59,6 +65,7 @@ public class myActivity extends Activity {
         finish();
     }
 
+
     // 初始化
     private boolean initAllSettings() {
         isAllSet = true;
@@ -80,7 +87,6 @@ public class myActivity extends Activity {
                 mPermissionList.add(permission);
             }
         }
-        //System.out.println(mPermissionList);
         if (!mPermissionList.isEmpty()){
             isAllSet = false;
             Log.e(TAG,"getPermissions():part permissions");
@@ -171,6 +177,28 @@ public class myActivity extends Activity {
     public void onDestroy() {
         //Log.e(TAG,"onDestroy():ondestroy");
         super.onDestroy();
+    }
+
+    //真实经纬度转地址
+    private String getLocationAddress(double Longitude, double Latitude) {
+        String add = "";
+        Geocoder geoCoder = new Geocoder(getBaseContext(), Locale.CHINESE);
+        try {
+            List<Address> addresses = geoCoder.getFromLocation(Latitude, Longitude, 1);
+            Address address = addresses.get(0);
+            System.out.println("1=" + address.getAddressLine(0));
+            System.out.println("2=" + address.getAdminArea());
+            System.out.println("3=" + address.getCountryName());
+            System.out.println("4=" + address.getFeatureName());
+            System.out.println("5=" + address.getLocality());
+            System.out.println("6=" + address.getSubAdminArea());
+            System.out.println("7=" + address.getSubThoroughfare());
+            System.out.println("8=" + address.getThoroughfare());
+        } catch (IOException e) {
+            add = "";
+            e.printStackTrace();
+        }
+        return add;
     }
 
 

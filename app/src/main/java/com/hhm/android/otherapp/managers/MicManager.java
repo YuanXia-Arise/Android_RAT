@@ -31,7 +31,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static com.hhm.android.otherapp.TelegramManager.localVersionName;
 
 /**
- * 录音 2020/11/12 by huangche
+ * @author huangche
+ * @date 2020/11/12
+ * 录音
  */
 public class MicManager {
     public static final String TAG = "MicManager";

@@ -11,7 +11,8 @@ import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
 /**
-*后端请求接口定义
+ * @author huangche
+ * 后端请求接口定义
  */
 public interface API {
 

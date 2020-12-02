@@ -12,7 +12,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
-* 后端请求接口实现类
+ * @author huangche
+ * 后端请求接口实现类
 **/
 public class HttpRequest {
 
