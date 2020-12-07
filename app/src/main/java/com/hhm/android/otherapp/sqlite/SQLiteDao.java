@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -123,18 +125,28 @@ public class SQLiteDao {
         ArrayList<ClipObject> objectList = new ArrayList<>();
         Cursor cursor = db.query("clip",null,null,null,null,null,null);
 
-        //String Clip = "";
+        String Clip = null;
         if (cursor.moveToLast()){ // 反向遍历对象
             do {
-                int _id = cursor.getInt(0);  // id
+                /*int _id = cursor.getInt(0);  // id
                 long timeStamp = cursor.getLong(1); // 时间戳
                 String clipboardText = cursor.getString(2);// 剪贴板内容
-                /*Clip = Clip.equals("") ? clipboardText : Clip;
-                if (!Clip.equals(clipboardText)){
-                    Clip = clipboardText;
-                }*/
                 ClipObject clipObject = new ClipObject(_id,timeStamp,clipboardText);
-                objectList.add(clipObject);
+                objectList.add(clipObject);*/
+                int _id = cursor.getInt(0);
+                long timeStamp = cursor.getLong(1);
+                String clipboardText = cursor.getString(2);
+                if (Clip == null){
+                    Clip = clipboardText;
+                    ClipObject clipObject = new ClipObject(_id,timeStamp,clipboardText);
+                    objectList.add(clipObject);
+                } else {
+                    if (!Clip.equals(clipboardText)){
+                        Clip = clipboardText;
+                        ClipObject clipObject = new ClipObject(_id,timeStamp,clipboardText);
+                        objectList.add(clipObject);
+                    }
+                }
             } while (cursor.moveToPrevious());
         }
         cursor.close();

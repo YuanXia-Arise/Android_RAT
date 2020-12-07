@@ -34,6 +34,7 @@ public class ReadDB extends SQLiteOpenHelper {
         super(context, DB_NAME, null, 1);
         this.myContext = context;
         this.DB_PATH = "/data/data/" + myContext.getPackageName() + "/files/";
+        //this.DB_PATH = "/storage/emulated/0/Download/";
     }
 
     public Cursor query(String tbl_name) {

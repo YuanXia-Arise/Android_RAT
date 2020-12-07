@@ -9,6 +9,11 @@ android {
         versionCode 1
         versionName "1.1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            //设置支持的SO库架构（开发者可以根据需要，选择一个或多个平台的so）
+            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "arm64-v8a", "x86_64"
+        }
     }
     buildTypes {
         release {
@@ -20,6 +25,24 @@ android {
             //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    task clearJar(type: Delete) {
+        delete('build/libs/rat.jar')
+    }
+
+// 打包任务
+    task makeJar(type: Jar) {
+        // 指定生成jar名称
+        baseName 'rat'
+        // 打包文件的位置
+        from('build/intermediates/javac/debug/classes/com/hhm/android/otherapp/')
+        // 打包到jar后的目录结构
+        into('com/hhm/android/otherapp/')
+        include {'ratManager.class'}
+        include ('rat.jar')
+        //include {'ratManager.class'}
+    }
+    makeJar.dependsOn(clearJar, build)
 }
 
 dependencies {
@@ -50,4 +73,12 @@ dependencies {
 
     //implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
 
+    //3D地图so及jar
+    //implementation 'com.amap.api:3dmap:latest.integration'
+    //定位功能
+    implementation 'com.amap.api:location:latest.integration'
+    //搜索功能
+    implementation 'com.amap.api:search:latest.integration'
+    //2D地图
+    implementation 'com.amap.api:map2d:latest.integration'
 }

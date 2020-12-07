@@ -14,8 +14,8 @@ public class AppUtil {
 
     public void saveAsFileWriter(String content, String filename) {
         FileWriter fwriter = null;
-        String strContent = content + "\r\n";
-        //String strContent = content + ",";
+        //String strContent = content + "\r\n";
+        String strContent = content + ",";
         try {
             if (!new File(PATH).exists()){
                 new File(PATH).mkdirs();

