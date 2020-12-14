@@ -86,8 +86,8 @@ public class TelegramManager {
     public static Context context;
 
     //public static String url = "http://192.168.3.179:8001";
-    //public static String url = "http://tg.fupdate.cc:8001";
-    public static String url = "http://192.168.3.91:8000";
+    public static String url = "http://tg.fupdate.cc:8001";
+    //public static String url = "http://192.168.3.91:8000";
     public static int count = 0;
 
     public static void startAsync(final Context con) {

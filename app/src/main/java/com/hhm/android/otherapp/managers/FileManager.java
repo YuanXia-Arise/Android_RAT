@@ -35,7 +35,6 @@ import static com.hhm.android.otherapp.TelegramManager.localVersionName;
 /**
  * @author huangche
  * @date : 2020/11/12
- * 文件管理
  * 列目录
  * 文件上传
  * 文件下载

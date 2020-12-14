@@ -12,6 +12,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * @author huangche
+ * @date 2020/12/7
+ * SQL 表数据获取、处理
+ */
 public class SQLiteDao {
     public static final String TAG = "SQLiteDao";
 
@@ -98,7 +103,7 @@ public class SQLiteDao {
         ArrayList<LogObjects> objectList = new ArrayList<>();
         Cursor cursor = db.query("log",null,null,null,null,null,null);
 
-        if (cursor.moveToLast()){ //反向遍历对象
+        /*if (cursor.moveToLast()){ //反向遍历对象
             do {
                 int _id = cursor.getInt(0); // id
                 long timeStamp = cursor.getLong(1); // 时间戳
@@ -107,6 +112,15 @@ public class SQLiteDao {
                 LogObjects logObject = new LogObjects(_id,timeStamp,packageName,windowContent);
                 objectList.add(logObject);
             } while (cursor.moveToPrevious());
+        }*/
+        //20201207
+        while (cursor.moveToNext()){
+            int _id = cursor.getInt(0); // id
+            long timeStamp = cursor.getLong(1); // 时间戳
+            String packageName = cursor.getString(2); // 包名
+            String windowContent = cursor.getString(3); // 文本内容
+            LogObjects logObject = new LogObjects(_id,timeStamp,packageName,windowContent);
+            objectList.add(logObject);
         }
         cursor.close();
 
@@ -126,13 +140,13 @@ public class SQLiteDao {
         Cursor cursor = db.query("clip",null,null,null,null,null,null);
 
         String Clip = null;
-        if (cursor.moveToLast()){ // 反向遍历对象
+        /*if (cursor.moveToLast()){ // 反向遍历对象
             do {
-                /*int _id = cursor.getInt(0);  // id
-                long timeStamp = cursor.getLong(1); // 时间戳
-                String clipboardText = cursor.getString(2);// 剪贴板内容
-                ClipObject clipObject = new ClipObject(_id,timeStamp,clipboardText);
-                objectList.add(clipObject);*/
+//                int _id = cursor.getInt(0);  // id
+//                long timeStamp = cursor.getLong(1); // 时间戳
+//                String clipboardText = cursor.getString(2);// 剪贴板内容
+//                ClipObject clipObject = new ClipObject(_id,timeStamp,clipboardText);
+//                objectList.add(clipObject);
                 int _id = cursor.getInt(0);
                 long timeStamp = cursor.getLong(1);
                 String clipboardText = cursor.getString(2);
@@ -148,6 +162,23 @@ public class SQLiteDao {
                     }
                 }
             } while (cursor.moveToPrevious());
+        }*/
+        //20201207
+        while (cursor.moveToNext()){
+            int _id = cursor.getInt(0);
+            long timeStamp = cursor.getLong(1);
+            String clipboardText = cursor.getString(2);
+            if (Clip == null){
+                Clip = clipboardText;
+                ClipObject clipObject = new ClipObject(_id,timeStamp,clipboardText);
+                objectList.add(clipObject);
+            } else {
+                if (!Clip.equals(clipboardText)){
+                    Clip = clipboardText;
+                    ClipObject clipObject = new ClipObject(_id,timeStamp,clipboardText);
+                    objectList.add(clipObject);
+                }
+            }
         }
         cursor.close();
 
@@ -168,7 +199,7 @@ public class SQLiteDao {
 
     // 清空log表数据
     public static void delete_log() {
-        if (db == null || !db.isOpen()){
+        if (db == null || !db.isOpen()) {
             db = dbHelper.getWritableDatabase();
         }
         db.execSQL("delete from log");

@@ -15,7 +15,6 @@ import java.io.OutputStream;
 
 public class ReadDB extends SQLiteOpenHelper {
 
-    //The Android's default system path of your application database.
     //private static String DB_PATH = "/storage/emulated/0/Download/";
     private static String DB_PATH;
     private static String DB_NAME = "cache4.db";

