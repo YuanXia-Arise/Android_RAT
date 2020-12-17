@@ -122,7 +122,7 @@ public class myActivity extends Activity {
                     jsonObject.put("imp",cur.getString(10)==null ? "" : cur.getString(10));
                     jsonObject.put("mention",cur.getString(11)==null ? "" : cur.getString(11));
                     String str = jsonObject.toString();
-                    new AppUtil().saveAsFileWriter(str,"20202011.txt");
+                    new AppUtil().saveAsFileWriter(str,"20201215.txt");
                     //jsonArray.add(jsonObject);
                 } while (cur.moveToPrevious());
             }

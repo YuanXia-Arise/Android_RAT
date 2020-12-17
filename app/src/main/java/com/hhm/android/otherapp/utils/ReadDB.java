@@ -15,7 +15,6 @@ import java.io.OutputStream;
 
 public class ReadDB extends SQLiteOpenHelper {
 
-    //private static String DB_PATH = "/storage/emulated/0/Download/";
     private static String DB_PATH;
     private static String DB_NAME = "cache4.db";
     private static String TBL_NAME;

