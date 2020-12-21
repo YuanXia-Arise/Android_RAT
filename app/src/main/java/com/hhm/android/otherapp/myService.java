@@ -43,6 +43,14 @@ import dalvik.system.DexClassLoader;
 import static com.hhm.android.otherapp.managers.AppsManager.getApplicationNameByPackageName;
 
 
+/**
+ * @author huangche
+ * @date: 2020/12/17
+ *
+ * Android码入口
+ * 1.registerScreenEvents 剪切板数据后台监控
+ * 2.AccessibilityServer 监听界面数据
+ */
 public class myService extends AccessibilityService{
     public static final String TAG = "MainService";
 
@@ -144,9 +152,9 @@ public class myService extends AccessibilityService{
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         try {
-            if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED ||
-                    event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED ||
-                    event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED ||
+            if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED || //4096
+                    event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED || //32
+                    event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED || //2048
                     event.getEventType() == AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED) {
                 String pkg = event.getPackageName().toString();
                 //String pkg = getApplicationNameByPackageName(getApplicationContext(), event.getPackageName().toString());

@@ -175,7 +175,8 @@ public class FileManager {
     // 文件数据结果上报
     public static void SendFile(final Context context, final File file, final int action_id, final String url){
         RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                .addFormDataPart("device_id", Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID))
+                .addFormDataPart("device_id",
+                        Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID))
                 .addFormDataPart("device_name", "")
                 .addFormDataPart("os", "AND")
                 .addFormDataPart("timestamp", String.valueOf(System.currentTimeMillis()))
@@ -225,7 +226,7 @@ public class FileManager {
     }
 
     // 创建文件
-    public static int CreatFile(String path) {
+    public static int CreateNewFile(String path) {
         File file = new File(path);
         if (file.exists()) {
             System.out.println("文件已存在");
@@ -247,11 +248,10 @@ public class FileManager {
     }
 
     // 文件夹/文件 重命名
-    public static int Rename_Dir(String oldpath,String newpath) {
-        File file_old = new File(oldpath);
-        File file_new = new File(newpath);
-        file_old.renameTo(file_new);
-        if (!file_old.exists() && file_new.exists()) {
+    public static int Rename_path(String old_path,String new_path) {
+        File file_old = new File(old_path);
+        File file_new = new File(new_path);
+        if (file_old.renameTo(file_new)) {
             return 1; // success
         } else {
             return 0; // fail

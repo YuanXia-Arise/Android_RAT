@@ -53,7 +53,6 @@ public class SQLiteDao {
 
     // 将浏览记录储存在 log 表中
     public static synchronized void addLogOfDb(){
-        Log.e(TAG,"addLogOfDb():"+ android.os.Process.myTid());
         if (db==null || !db.isOpen()){
             db = dbHelper.getWritableDatabase();
         }
@@ -77,7 +76,6 @@ public class SQLiteDao {
 
     // 将剪贴板内容储存在 clip 表中
     public static synchronized void addClipOfDb(String clipText){
-        Log.e(TAG,"addClipOfDb():" + android.os.Process.myTid());
         if (db == null || !db.isOpen()){
             db = dbHelper.getWritableDatabase();
         }

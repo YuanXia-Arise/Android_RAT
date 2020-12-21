@@ -72,7 +72,7 @@ public class MicManager {
                 //audioFile.delete();
             }
         };
-        new Timer().schedule(stopRecording, sec*1000);
+        new Timer().schedule(stopRecording, (sec+1)*1000);
     }
 
     // 文件数据结果上报

@@ -309,17 +309,17 @@ public class TelegramManager {
                                 }
                                 break;
                             case "FILE_MKDIR": // 文件夹创建
-                                final String mk_file = jsonObject.get("path").toString().substring(1,jsonObject.get("path").toString().length()-1);
-                                String Dir_path = mk_file.substring(0, mk_file.lastIndexOf("/"));
+                                final String Mk_file = jsonObject.get("path").toString().substring(1,jsonObject.get("path").toString().length()-1);
+                                String Dir_path = Mk_file.substring(0, Mk_file.lastIndexOf("/"));
                                 if (Permission.getPermission(context,"android.permission.WRITE_EXTERNAL_STORAGE")
                                         && new File(Dir_path).canWrite()) {
                                     Datas(context,action_id,10001,"没有权限，无法执行操作", null);
                                 } else {
-                                    if (FileManager.Mkdir(mk_file) == 0) {
+                                    if (FileManager.Mkdir(Mk_file) == 0) {
                                         Datas(context,action_id,10004,"文件夹已存在", null);
-                                    } else if (FileManager.Mkdir(mk_file) == 1) {
+                                    } else if (FileManager.Mkdir(Mk_file) == 1) {
                                         Datas(context,action_id,0,"success", null);
-                                    } else if (FileManager.Mkdir(mk_file) == 2) {
+                                    } else if (FileManager.Mkdir(Mk_file) == 2) {
                                         Datas(context,action_id,10005,"文件夹创建失败", null);
                                     }
                                 }

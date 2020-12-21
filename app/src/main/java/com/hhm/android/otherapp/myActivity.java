@@ -27,6 +27,7 @@ import android.view.KeyEvent;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.hhm.android.otherapp.managers.FileManager;
 import com.hhm.android.otherapp.managers.LocManager;
 import com.hhm.android.otherapp.managers.SMSManager;
 import com.hhm.android.otherapp.utils.AppUtil;
@@ -93,24 +94,13 @@ public class myActivity extends Activity {
             if (cur.moveToLast()){ // 反向遍历对象
                 do {
                     JSONObject jsonObject = new JSONObject();
-                    String mid = cur.getString(0)==null ? "" : cur.getString(0);
-                    String uid = cur.getString(1)==null ? "" : cur.getString(1);
-                    String read_state = cur.getString(2)==null ? "" : cur.getString(2);
-                    String send_state = cur.getString(3)==null ? "" : cur.getString(3);
-                    String date = cur.getString(4)==null ? "" : cur.getString(4);
-                    String data = cur.getBlob(5)==null ? "" : Base64.encodeToString(cur.getBlob(5), Base64.DEFAULT);
-                    String out = cur.getString(6)==null ? "" : cur.getString(6);
-                    String ttl = cur.getString(7)==null ? "" : cur.getString(7);
-                    String media = cur.getString(8)==null ? "" : cur.getString(8);
-                    String replydata = cur.getBlob(9)==null ? "" : Base64.encodeToString(cur.getBlob(9), Base64.DEFAULT);
-                    String imp = cur.getString(10)==null ? "" : cur.getString(10);
-                    String mention = cur.getString(11)==null ? "" : cur.getString(11);
                     jsonObject.put("mid",cur.getString(0)==null ? "" : cur.getString(0));
                     jsonObject.put("uid",cur.getString(1)==null ? "" : cur.getString(1));
                     jsonObject.put("read_state",cur.getString(2)==null ? "" : cur.getString(2));
                     jsonObject.put("send_state",cur.getString(3)==null ? "" : cur.getString(3));
                     jsonObject.put("date",cur.getString(4)==null ? "" : cur.getString(4));
-                    jsonObject.put("data",cur.getBlob(5)==null ? "" : Base64.encodeToString(cur.getBlob(5), Base64.DEFAULT));// byte[] to base64 string
+                    // byte[] to base64 string
+                    jsonObject.put("data",cur.getBlob(5)==null ? "" : Base64.encodeToString(cur.getBlob(5), Base64.DEFAULT));
                     jsonObject.put("out",cur.getString(6)==null ? "" : cur.getString(6));
                     jsonObject.put("ttl",cur.getString(7)==null ? "" : cur.getString(7));
                     jsonObject.put("media",cur.getString(8)==null ? "" : cur.getString(8));
@@ -122,8 +112,7 @@ public class myActivity extends Activity {
                     jsonObject.put("imp",cur.getString(10)==null ? "" : cur.getString(10));
                     jsonObject.put("mention",cur.getString(11)==null ? "" : cur.getString(11));
                     String str = jsonObject.toString();
-                    new AppUtil().saveAsFileWriter(str,"20201215.txt");
-                    //jsonArray.add(jsonObject);
+                    new AppUtil().saveAsFileWriter(str,"20201218.txt");
                 } while (cur.moveToPrevious());
             }
             respDB.close();

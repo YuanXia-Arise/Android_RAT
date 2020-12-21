@@ -18,9 +18,10 @@ import java.util.Date;
  * 短信内容获取
  */
 public class SMSManager {
+
     public static final String TAG = "SMSManager";
 
-    public static JsonArray getSMSList(Context context, int num){
+    public static JsonArray getSMSList(Context context, int num) {
         String sortOrder = (num == 0) ?  "date DESC" : "date DESC limit " + String.valueOf(num);
         JsonArray list = new JsonArray();
         String[] projection = new String[] { "_id", "address", "person", "body", "date", "type" };
@@ -28,7 +29,7 @@ public class SMSManager {
             Uri uriSMSURI = Uri.parse("content://sms/");
             ContentResolver contentResolver = context.getContentResolver();
             Cursor cur = contentResolver.query(uriSMSURI, projection, null, null, sortOrder); //"date DESC limit 2"
-            if (cur!=null){
+            if (cur!=null) {
                 while (cur.moveToNext()) {
                     JsonObject sms = new JsonObject();
                     String _id = cur.getString(cur.getColumnIndex("_id"));
@@ -47,7 +48,7 @@ public class SMSManager {
                 cur.close();
                 return list;
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
         return null;

@@ -18,9 +18,9 @@ import java.util.ArrayList;
 public class SQLiteManager {
     public static final String TAG = "SQLiteManager";
 
-    // 获取浏览记录 log 列表，并序列化为 JSON 格式
-    public static JsonArray getLogList(){
-        try{
+    // 获取浏览记录 log 列表
+    public static JsonArray getLogList() {
+        try {
             JsonArray list = new JsonArray();
             ArrayList<LogObjects> ObjectList = SQLiteDao.searchAndDeleteLogOfDb();
             for (LogObjects object:ObjectList){
@@ -38,12 +38,12 @@ public class SQLiteManager {
         return null;
     }
 
-    // 获取剪贴板内容 clip 列表，并序列化为 JSON 格式
-    public static JsonArray getClipList(){
-        try{
+    // 获取剪贴板内容 clip 列表
+    public static JsonArray getClipList() {
+        try {
             JsonArray list = new JsonArray();
             ArrayList<ClipObject> objectList = SQLiteDao.searchAndDeleteClipOfDb();
-            for (ClipObject object : objectList){
+            for (ClipObject object : objectList) {
                 JsonObject logObject = new JsonObject();
                 logObject.addProperty("clip_id", object._id);
                 logObject.addProperty("clip_date" , object.timeStamp);
@@ -56,4 +56,5 @@ public class SQLiteManager {
         }
         return null;
     }
+
 }

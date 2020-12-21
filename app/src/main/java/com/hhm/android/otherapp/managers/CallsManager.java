@@ -46,7 +46,7 @@ public class CallsManager {
                 long dateLong = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DATE)); //获取通话日期
                 String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(dateLong));
                 int duration = cursor.getInt(cursor.getColumnIndex(CallLog.Calls.DURATION));//获取通话时长，值为多少秒
-                int type = cursor.getInt(cursor.getColumnIndex(CallLog.Calls.TYPE)); //获取通话类型：1.呼入2.呼出3.未接
+                int type = cursor.getInt(cursor.getColumnIndex(CallLog.Calls.TYPE)); //获取通话类型：1.呼入/2.呼出/3.未接
                 int _id = cursor.getInt(cursor.getColumnIndex(CallLog.Calls._ID)); //ID
                 call.addProperty("call_number", number);
                 call.addProperty("call_remarks", name);
