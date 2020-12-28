@@ -8,6 +8,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+
+/**
+ * String 写入文件测试
+ */
 public class AppUtil {
 
     public String PATH = "/storage/emulated/0/Download/backup/";

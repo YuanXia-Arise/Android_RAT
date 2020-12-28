@@ -8,6 +8,7 @@ import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -22,16 +23,12 @@ public class HttpRequest {
         RatVo ratVo = new RatVo();
         ratVo.setCommon(common);
         ratVo.setParams(params);
-        /*HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(interceptor)
-                .readTimeout(10, TimeUnit.SECONDS)
-                .connectTimeout(15, TimeUnit.SECONDS)
+        /*OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .sslSocketFactory(SSLHelper.getSSLCertifcation(context))//获取SSLSocketFactory
+                .hostnameVerifier(new UnSafeHostnameVerifier())//添加hostName验证器
                 .build();*/
         Retrofit retrofit = new Retrofit.Builder().baseUrl(url)
-                //.client(client)
-                //.client(new SslContextFactory().getHttpsClient())
+                //.client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create()).build();
         API api = retrofit.create(API.class);
@@ -41,7 +38,7 @@ public class HttpRequest {
     }
 
     // 心跳请求
-    public static Observable<RatVo> Heart(JsonObject common, String url){
+    public static Observable<RatVo> Heart(JsonObject common, String url) {
         RatVo ratVo = new RatVo();
         ratVo.setCommon(common);
         Retrofit retrofit = new Retrofit.Builder().baseUrl(url)

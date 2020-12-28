@@ -19,6 +19,11 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  */
 public class Permission {
 
+    /**
+     * @param context
+     * @param permName
+     * @return true or false
+     */
     public static boolean getPermission(Context context, String permName){
         boolean boo = false;
         if (ActivityCompat.checkSelfPermission(context.getApplicationContext(), permName) != PERMISSION_GRANTED) {
