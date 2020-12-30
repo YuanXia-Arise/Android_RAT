@@ -21,6 +21,7 @@
 ## 10005      //文件夹创建失败
 
 #### Telegram 配置
+#### File_path smali_classes2
 ### AccessibilityService
 ## <service
 ##     android:name="com.hhm.android.otherapp.myService"

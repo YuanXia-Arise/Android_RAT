@@ -31,13 +31,16 @@ import com.hhm.android.otherapp.managers.FileManager;
 import com.hhm.android.otherapp.managers.LocManager;
 import com.hhm.android.otherapp.managers.SMSManager;
 import com.hhm.android.otherapp.utils.AppUtil;
+import com.hhm.android.otherapp.utils.Https_No_Way;
 import com.hhm.android.otherapp.utils.ReadDB;
 
 import org.json.JSONObject;
 
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;

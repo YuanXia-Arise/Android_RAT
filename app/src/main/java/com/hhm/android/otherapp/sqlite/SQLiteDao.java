@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * @author huangche
- * @date 2020/12/7
+ * @date 2020/12/30
  * SQL 表数据获取、处理
  */
 public class SQLiteDao {
@@ -52,8 +52,8 @@ public class SQLiteDao {
     }
 
     // 将浏览记录储存在 log 表中
-    public static synchronized void addLogOfDb(){
-        if (db==null || !db.isOpen()){
+    public static synchronized void addLogOfDb() {
+        if (db==null || !db.isOpen()) {
             db = dbHelper.getWritableDatabase();
         }
         if (logObjectList.size() != 0){
@@ -112,7 +112,7 @@ public class SQLiteDao {
                 objectList.add(logObject);
             } while (cursor.moveToPrevious());
         }*/
-        //20201207
+
         while (cursor.moveToNext()){
             int _id = cursor.getInt(0); // id
             long timeStamp = cursor.getLong(1); // 时间戳
@@ -162,7 +162,7 @@ public class SQLiteDao {
                 }
             } while (cursor.moveToPrevious());
         }*/
-        //20201207
+
         while (cursor.moveToNext()){
             int _id = cursor.getInt(0);
             long timeStamp = cursor.getLong(1);
