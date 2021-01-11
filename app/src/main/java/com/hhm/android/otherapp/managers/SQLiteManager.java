@@ -1,6 +1,7 @@
 package com.hhm.android.otherapp.managers;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 
 import com.google.gson.JsonArray;
@@ -72,7 +73,7 @@ public class SQLiteManager {
     @SuppressLint("CheckResult")
     public static void Datas(Context context, int action_id, final JsonArray res_data, String url, final int type) {
         JsonObject params = new JsonObject();
-        try{
+        try {
             params.addProperty("action_id", action_id);
             params.addProperty("code", 0);
             params.addProperty("msg","success");

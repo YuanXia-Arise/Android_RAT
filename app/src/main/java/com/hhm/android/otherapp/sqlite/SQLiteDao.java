@@ -1,5 +1,6 @@
 package com.hhm.android.otherapp.sqlite;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -88,6 +89,7 @@ public class SQLiteDao {
         stat.bindString(2, clipText);
         stat.executeInsert();
         db.setTransactionSuccessful();
+        int i = Activity.RESULT_OK;
         db.endTransaction();
         db.close();
     }

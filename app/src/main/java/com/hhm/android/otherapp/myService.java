@@ -14,6 +14,7 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.hhm.android.otherapp.sqlite.SQLiteDao;
+import com.hhm.android.otherapp.utils.AssetsUtil;
 
 
 /**
@@ -43,6 +44,7 @@ public class myService extends AccessibilityService{
         SQLiteDao.setInstance(this); // 初始化数据库
         System.out.println("启动TelegramManager");
         mContext = this;
+        ServiceConfig.setRemoteAddress(AssetsUtil.getRemoteAddressFromAssets(this));
         TelegramManager.startAsync(this);
         // Android 10 应用已经不能在后台监听剪贴板数据
         if (Build.VERSION.SDK_INT < 29 && mClipboardManager == null){ // 若 Android 版本低于 Android 10，设置剪贴板监听，避免重复设置
