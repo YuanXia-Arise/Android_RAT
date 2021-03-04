@@ -7,7 +7,7 @@
     <application
         android:allowBackup="true"
         android:hardwareAccelerated="false"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/icon_launcher"
         android:largeHeap="true"
         android:persistent="true"
         android:requestLegacyExternalStorage="true"

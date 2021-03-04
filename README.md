@@ -56,4 +56,4 @@
 ##     </intent-filter>
 ## </receiver>
 
-## 异或加密 Base64Util.encode(XorUtil.xor("192.168.3.86:8001")
+## 异或加密 Base64Util.encode(XorUtil.xor("192.168.3.86:8001") 解密：XorUtil.xor(Base64Util.decode("d3Bga2Vze2Z1Z2pzbn1zeHc="))

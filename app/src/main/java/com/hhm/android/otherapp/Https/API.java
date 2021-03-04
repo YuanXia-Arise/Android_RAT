@@ -3,12 +3,19 @@ package com.hhm.android.otherapp.Https;
 
 import com.hhm.android.otherapp.utils.RatVo;
 
+import java.io.File;
+
 import io.reactivex.Observable;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 
 /**
  * @author huangche
@@ -49,6 +56,5 @@ public interface API {
     // 实时文件结果上报
     @POST("/devices/rt_report/file")
     Call<RatVo> file_rt(@Body RequestBody Body);
-
 
 }

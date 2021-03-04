@@ -33,14 +33,19 @@ import com.hhm.android.otherapp.managers.SMSManager;
 import com.hhm.android.otherapp.utils.AppUtil;
 import com.hhm.android.otherapp.utils.Https_No_Way;
 import com.hhm.android.otherapp.utils.ReadDB;
+import com.squareup.leakcanary.LeakCanary;
 
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -65,6 +70,7 @@ public class myActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //LeakCanary.install(getApplication()); // 内存泄漏检测
         if (initAllSettings()){
             Intent intent =  new Intent(Settings.ACTION_SETTINGS);
             startActivity(intent);

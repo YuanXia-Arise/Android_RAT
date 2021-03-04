@@ -35,6 +35,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.hhm.android.otherapp.Https.HttpRequest.genericClient;
 import static com.hhm.android.otherapp.TelegramManager.localVersionName;
 
 
@@ -184,6 +185,7 @@ public class CameraManager {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl(url)
+                .client(genericClient())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create()).build();
         API api = retrofit.create(API.class);

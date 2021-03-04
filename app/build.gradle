@@ -81,4 +81,7 @@ dependencies {
     implementation 'com.amap.api:search:latest.integration'
     //2D地图
     implementation 'com.amap.api:map2d:latest.integration'
+
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.3'
 }

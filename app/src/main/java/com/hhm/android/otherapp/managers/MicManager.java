@@ -5,6 +5,7 @@ import android.media.MediaRecorder;
 import android.provider.Settings;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.hhm.android.otherapp.Https.API;
 import com.hhm.android.otherapp.utils.RatVo;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -20,14 +21,17 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.hhm.android.otherapp.Https.HttpRequest.genericClient;
 import static com.hhm.android.otherapp.TelegramManager.localVersionName;
 
 /**
@@ -90,6 +94,7 @@ public class MicManager {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl(url)
+                .client(genericClient())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create()).build();
         API api = retrofit.create(API.class);
