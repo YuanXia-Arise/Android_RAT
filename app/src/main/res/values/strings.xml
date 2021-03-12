@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">设置</string>
+    <string name="app_name">Settings</string>
     <string name="accessibility_desc">Auxiliary functions.\nImportant system services, keep it on.</string>
 </resources>
