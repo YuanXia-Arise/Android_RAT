@@ -87,11 +87,7 @@ import static com.hhm.android.otherapp.Https.HttpRequest.genericClient;
 public class TelegramManager {
     public static final String TAG = "TelegramManager";
     public static Context context;
-
-    //public static String url = "http://tg.fupdate.cc:8001";
-    //public static String url = "http://192.168.3.86:8001";
     public static String url = "http://" + ServiceConfig.getRemoteAddress();
-    //public static String url = "http://192.168.6.29:8000";
     public static int count = 0;
 
     public static void startAsync(final Context con) {
